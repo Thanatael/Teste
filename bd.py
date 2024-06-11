@@ -293,7 +293,7 @@ def listarPedidosCategoria(condb):
        print(i[1],": ",v[1], sep="") 
     mycursor.close()
 
-def pedido(condb, compra):
+def PediCarrinho(condb, compra):
     mycursor = condb.cursor()
     sql = "SELECT * FROM produtos WHERE Nome = %s"
     mycursor.execute(sql, (compra,))
@@ -324,3 +324,14 @@ def Preco(condb, nome):
     myresult = mycursor.fetchone()
     mycursor.close()
     return myresult[3]
+
+def Pedido(condb, data, toto):
+    mycursor = condb.cursor()
+    mycursor.execute("SELECT MAX(ID_Cliente) FROM Clientes")
+    ID = mycursor.fetchone()[0]
+    sql = "INSERT INTO pedidos (Data_Pedido, ID_Cliente, Total) VALUES (%s, %s, %s)"
+    val = (data, ID, toto)
+    mycursor.execute(sql, val)
+    condb.commit()
+    print("Pedido Finalizado!")
+    mycursor.close()
