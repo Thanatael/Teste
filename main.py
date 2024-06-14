@@ -6,6 +6,7 @@ conbd = connect()
 
 Carrinho = []
 Total = 0
+clienteNovo = True
 
 while True:
     print("=" * 50)
@@ -18,92 +19,115 @@ while True:
         print("Encerrando..")
         break
     elif opc == "1":  # ============================================================= PEDIDO
-        while True:
-            print("=" * 50)
-            oplistar = input("Selecione oque deseja fazer a seguir: \n"
-                            "[1] Comprar produto \n"
-                            "[2] Descrição dos produtos \n"
-                            "[3] Categoria dos produtos \n"
-                            "[4] Carrinho \n"
-                            "[5] Voltar \n"
-                            "--> ")
-            if oplistar == "5":
-                break
-            elif oplistar == "1":
-                while True:
-                    listarProdutosPedido(conbd)
+            while True:
+                if clienteNovo == True:
                     print("=" * 50)
-                    vavpedido = input("Digite o [Nome] do produto que deseja comprar: ")
-                    if vavpedido in VerificaProdu(conbd):
-                        # ===========================================================
-                        PediCarrinho(conbd, compra=vavpedido)
-                        Carrinho.append(vavpedido)
-                        Total += float(Preco(conbd, nome=vavpedido))
-                        # ===========================================================
-                        print("="*50)
-                        opcomp = input("Deseja comprar novamente? \n"
-                                        "[1] Sim \n"
-                                        "[2] Não \n"
-                                        "--> ")
-                        if opcomp == "2":
-                            break
-                        elif opcomp == "1":
-                            VerificaProdu(conbd)
-                            continue
-                        else:
-                            print("Valor inválido, tente novamente.")
-                    else:
-                        print("=" * 50)
-                        print("Produto não encontrado, tente novamente.")
-                        print("=" * 50)
-                        continue
-            elif oplistar == "2":
-                listarPedidosDescricao(conbd)
-            elif oplistar == "3":
-                listarPedidosCategoria(conbd)
-            elif oplistar == "4": # CARRINHO DO PEDIDO =====================================
-                while True:
-                    print("="*20,"CARRINHO","="*20)
-                    for pr in Carrinho:
-                        print(pr, ": R$" ,Preco(conbd, nome=pr), sep="")
-                    print("-"*50)
-                    print("Total: R$",round(Total, 2), sep="")                    
-                    print("=" * 50)
-                    opcar = input("Digite oq deseja fazer a seguir?: \n"
-                                  "[1] Finalizar pedido \n"
-                                  "[2] Remover um produto da lista \n"
-                                  "[3] Voltar \n"
-                                  "--> ")
-                    if opcar == "3":
+                    opcliente = input("Você é um novo cliente? Deseja se cadastra-se? \n"
+                                    "[1] Sim \n"
+                                    "[2] Não \n"
+                                    "--> ")
+                    if opcliente == "2":
+                        clienteNovo = False
                         break
-                    elif opcar == "1": # FINALIZAR O PEDIDO =========================================
-                        print("=" * 50)
-                        datahj = datetime.now().strftime("%y-%m-%d")
-                        Pedido(conbd, data=datahj, toto=float(Total))
-                        Total -= Total
-                        Carrinho = []
+                    elif opcliente == "1":
+                        print("="*10,"Digite a seguir: Ex [João],[Silva],[Rua Palmeiras, 000],[São Paulo],[00000-000]","="*10)
+                        cadastrarClientes(conbd,
+                                        nome=input("Nome: "),
+                                        sobrenome=input("Sobrenome: "),
+                                        endereco=input("Endereço: "),
+                                        cidade=input("Cidade: "),
+                                        codigo=input("Código Postal: "))
+                        clienteNovo = False
                         break
-                    elif opcar == "2": # REMOVER DA LISTA CARRINHO ==================================
-                        while True:
-                            print("=" * 50)
-                            reop = input("Digite o [NOME] do produto que deseja REMOVER do carrinho \n"
-                                         "Digite [x] para cancelar: \n"
-                                         "--> ")
-                            if reop == "x":
-                                break
-                            elif reop in Carrinho:
-                                print("=" * 50)
-                                Carrinho.remove(reop)
-                                Total -= float(Preco(conbd, nome=reop))
-                                print(reop, "Foi removido do carrinho.")
-                                break
-                            else:
-                                print("Produto não encontrado, tente novamente.")
-                                continue
                     else:
                         print("Valor inválido, tente novamente.")
-            else:
-                print("Valor inválido, tente novamente.")
+                        continue
+            while True:
+                print("=" * 50)
+                oplistar = input("Selecione oque deseja fazer a seguir: \n"
+                                "[1] Comprar produto \n"
+                                "[2] Descrição dos produtos \n"
+                                "[3] Categoria dos produtos \n"
+                                "[4] Carrinho \n"
+                                "[5] Voltar \n"
+                                "--> ")
+                if oplistar == "5":
+                    break
+                elif oplistar == "1": # ======================== COMPRA
+                    while True:
+                        listarProdutosPedido(conbd)
+                        print("=" * 50)
+                        vavpedido = input("Digite o [Nome] do produto que deseja comprar: ")
+                        if vavpedido in VerificaProdu(conbd):
+                            # ===========================================================
+                            PediCarrinho(conbd, compra=vavpedido)
+                            Carrinho.append(vavpedido)
+                            Total += float(Preco(conbd, nome=vavpedido))
+                            # ===========================================================
+                            print("="*50)
+                            opcomp = input("Deseja comprar novamente? \n"
+                                            "[1] Sim \n"
+                                            "[2] Não \n"
+                                            "--> ")
+                            if opcomp == "2":
+                                break
+                            elif opcomp == "1":
+                                VerificaProdu(conbd)
+                                continue
+                            else:
+                                print("Valor inválido, tente novamente.")
+                        else:
+                            print("=" * 50)
+                            print("Produto não encontrado, tente novamente.")
+                            print("=" * 50)
+                            continue
+                elif oplistar == "2": # ======================== DESCRIÇÃO
+                    listarPedidosDescricao(conbd)
+                elif oplistar == "3": # ======================== CATEGORIA
+                    listarPedidosCategoria(conbd)
+                elif oplistar == "4": # CARRINHO DO PEDIDO =====================================
+                    while True:
+                        print("="*20,"CARRINHO","="*20)
+                        for pr in Carrinho:
+                            print(pr, ": R$" ,Preco(conbd, nome=pr), sep="")
+                        print("-"*50)
+                        print("Total: R$",round(Total, 2), sep="")                    
+                        print("=" * 50)
+                        opcar = input("Digite oq deseja fazer a seguir?: \n"
+                                    "[1] Finalizar pedido \n"
+                                    "[2] Remover um produto da lista \n"
+                                    "[3] Voltar \n"
+                                    "--> ")
+                        if opcar == "3":
+                            break
+                        elif opcar == "1": # FINALIZAR O PEDIDO =========================================
+                            print("=" * 50)
+                            datahj = datetime.now().strftime("%y-%m-%d")
+                            Pedido(conbd, data=datahj, toto=float(Total)) # FUNÇÃO PEDIDO
+                            Total -= Total
+                            Carrinho = []
+                            break
+                        elif opcar == "2": # REMOVER DA LISTA CARRINHO ==================================
+                            while True:
+                                print("=" * 50)
+                                reop = input("Digite o [NOME] do produto que deseja REMOVER do carrinho \n"
+                                            "Digite [x] para cancelar: \n"
+                                            "--> ")
+                                if reop == "x":
+                                    break
+                                elif reop in Carrinho:
+                                    print("=" * 50)
+                                    Carrinho.remove(reop)
+                                    Total -= float(Preco(conbd, nome=reop))
+                                    print(reop, "Foi removido do carrinho.")
+                                    break
+                                else:
+                                    print("Produto não encontrado, tente novamente.")
+                                    continue
+                        else:
+                            print("Valor inválido, tente novamente.")
+                else:
+                    print("Valor inválido, tente novamente.")
 
     elif opc == "2":  # ============================================================= BANCO DE DADOS
         while True:

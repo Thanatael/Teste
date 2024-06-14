@@ -1,3 +1,22 @@
+# ================================================ VERIFICAR ============================================================
+
+def verifica(condb, tabela, veri): # Função para verificar quantas linhas de ID a tabela possui
+    mycursor = condb.cursor()
+    mycursor.execute(f"SELECT * FROM {tabela}")
+    myresult = mycursor.fetchall()
+    veri = []
+    for x in myresult:
+        veri.append(x[0])
+    mycursor.close()
+    return list(veri)
+
+def verificaColums(condb, table, colum): # Função para verificar quantas colunas a tabela possui
+    mycursor = condb.cursor()
+    mycursor.execute(f"DESCRIBE {table}")
+    colum = mycursor.fetchall()
+    mycursor.close()
+    return [c[0] for c in colum if c[3] != 'PRI']
+
 # ================================================ CADASTRO ============================================================
 def cadastrarProdutos(condb, nome, descricao, preco, quantidade):
     myCursor = condb.cursor()
@@ -97,7 +116,7 @@ def cadastrarClientes(condb, nome, sobrenome, endereco, cidade, codigo):
     val = (nome, sobrenome, endereco, cidade, codigo)
     myCursor.execute(sql, val)
     condb.commit()
-    print("Clientes cadastrados com sucesso!")
+    print("Cliente cadastrados com sucesso!")
     myCursor.close()
 
 
@@ -132,27 +151,6 @@ def cadastrarPromocoes(condb, nome, descricao, datai, dataf):
 
 
 # ================================================== ATUALIZAR =========================================================
-
-# ========================================================
-
-def verifica(condb, tabela, veri): # Função para verificar quantas linhas de ID a tabela possui
-    mycursor = condb.cursor()
-    mycursor.execute(f"SELECT * FROM {tabela}")
-    myresult = mycursor.fetchall()
-    veri = []
-    for x in myresult:
-        veri.append(x[0])
-    mycursor.close()
-    return list(veri)
-
-def verificaColums(condb, table, colum): # Função para verificar quantas colunas a tabela possui
-    mycursor = condb.cursor()
-    mycursor.execute(f"DESCRIBE {table}")
-    colum = mycursor.fetchall()
-    mycursor.close()
-    return [c[0] for c in colum if c[3] != 'PRI']
-
-# ========================================================
 
 def atualizarProdutos(condb, coluna, new, linha):
     mycursor = condb.cursor()
