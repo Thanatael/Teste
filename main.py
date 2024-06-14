@@ -5,7 +5,7 @@ from datetime import datetime
 conbd = connect()
 
 Carrinho = []
-Total = 0
+Total = 0.00
 clienteNovo = True
 
 while True:
@@ -20,7 +20,7 @@ while True:
         break
     elif opc == "1":  # ============================================================= PEDIDO
             while True:
-                if clienteNovo == True:
+                if clienteNovo:
                     print("=" * 50)
                     opcliente = input("Você é um novo cliente? Deseja se cadastra-se? \n"
                                     "[1] Sim \n"
@@ -88,8 +88,19 @@ while True:
                 elif oplistar == "4": # CARRINHO DO PEDIDO =====================================
                     while True:
                         print("="*20,"CARRINHO","="*20)
-                        for pr in Carrinho:
-                            print(pr, ": R$" ,Preco(conbd, nome=pr), sep="")
+                        quantia = {}
+                        for produ in Carrinho:
+                            if produ in quantia:
+                                quantia[produ]["quantidade"] += 1
+                                quantia[produ]["precototal"] += Preco(conbd,nome=produ)
+                            else:
+                                quantia[produ] = {
+                                    "quantidade": 1,
+                                    "precototal": Preco(conbd,nome=produ)
+                                    }
+                        for pr, info in quantia.items():
+                            print(f"{pr}: R${info['precototal']} [{info['quantidade']}x]")
+                        # --------------------------------------------------------------------------
                         print("-"*50)
                         print("Total: R$",round(Total, 2), sep="")                    
                         print("=" * 50)
@@ -100,13 +111,31 @@ while True:
                                     "--> ")
                         if opcar == "3":
                             break
+
                         elif opcar == "1": # FINALIZAR O PEDIDO =========================================
-                            print("=" * 50)
-                            datahj = datetime.now().strftime("%y-%m-%d")
-                            Pedido(conbd, data=datahj, toto=float(Total)) # FUNÇÃO PEDIDO
-                            Total -= Total
-                            Carrinho = []
-                            break
+                            if Carrinho:
+                                print("=" * 50)
+                                datahj = datetime.now().strftime("%y-%m-%d")
+                                lobos = verificaNome(conbd, tabela='produtos')
+                                Pedido(conbd, data=datahj, toto=float(Total)) # FUNÇÃO PEDIDO
+
+                                for di, qua in quantia.items(): # Loop da FUNÇÃO DETALHES PEDIDO
+                                    if di in lobos:
+                                        detalhesPedi(conbd,
+                                                     IDprodu=Ovelhas(conbd,nome=di),
+                                                     quanti=qua['quantidade']
+                                                     )
+
+                                # RESET -------------
+                                Total = 0.00
+                                Carrinho = []
+                                quantia = {}
+                                # -------------------
+                                break
+                            else:
+                                print("="*50)
+                                print("O CARRINHO está VAZIO! Não há compras para ser finalizadas.")
+
                         elif opcar == "2": # REMOVER DA LISTA CARRINHO ==================================
                             while True:
                                 print("=" * 50)
@@ -301,23 +330,23 @@ while True:
                         tab = 'produtos'  # TABELA ESCOLHIDA
                         # =================================
 
-                        if verifica(conbd, tabela=tab, veri=0) != 0:  # Verifica se possui valores
+                        if verifica(conbd, tabela=tab) != 0:  # Verifica se possui valores
                             while True:
                                 print("=" * 50)
                                 oplinha = input("São os IDs {} na tabela [{}], digite o ID que deseja alterar \n"
                                                 "Ou digite [sair] para voltar \n"
                                                 "--> "
-                                                .format(verifica(conbd, tabela=tab, veri=[]), tab))
+                                                .format(verifica(conbd, tabela=tab), tab))
                                 if oplinha != "sair":
                                     if oplinha.isnumeric():  # Verifica se o usuario digitou um número
                                         if int(oplinha) in verifica(conbd, tabela=tab,
-                                                                    veri=[]):  # Verifica número digitado do usúsario
+                                                                    ):  # Verifica número digitado do usúsario
                                             print("=" * 50)
                                             print("Aqui está a lista das colunas dessa tabela: \n",
-                                                verificaColums(conbd, table=tab, colum=[]))
+                                                verificaColums(conbd, table=tab))
                                             opcolum = input("Digite o nome da coluna que deseja alterar \n"
                                                             "--> ")
-                                            if opcolum in verificaColums(conbd, table=tab, colum=[]):
+                                            if opcolum in verificaColums(conbd, table=tab):
                                                 print("=" * 50)
                                                 # ===================================
                                                 atualizarProdutos(conbd,
@@ -343,23 +372,23 @@ while True:
                         tab = 'clientes'  # TABELA ESCOLHIDA
                         # =================================
 
-                        if verifica(conbd, tabela=tab, veri=0) != 0:  # Verifica se possui valores
+                        if verifica(conbd, tabela=tab) != 0:  # Verifica se possui valores
                             while True:
                                 print("=" * 50)
                                 oplinha = input("São os IDs {} na tabela [{}], digite o ID que deseja alterar \n"
                                                 "Ou digite [sair] para voltar \n"
                                                 "--> "
-                                                .format(verifica(conbd, tabela=tab, veri=0), tab))
+                                                .format(verifica(conbd, tabela=tab), tab))
                                 if oplinha != "sair":
                                     if oplinha.isnumeric():  # Verifica se o usuario digitou um número
                                         if int(oplinha) in verifica(conbd, tabela=tab,
-                                                                    veri=[]):  # Verifica número digitado do usúsario
+                                                                    ):  # Verifica número digitado do usúsario
                                             print("=" * 50)
                                             print("Aqui está a lista das colunas dessa tabela: \n",
-                                                verificaColums(conbd, table=tab, colum=[]))
+                                                verificaColums(conbd, table=tab))
                                             opcolum = input("Digite o nome da coluna que deseja alterar \n"
                                                             "--> ")
-                                            if opcolum in verificaColums(conbd, table=tab, colum=[]):
+                                            if opcolum in verificaColums(conbd, table=tab):
                                                 print("=" * 50)
                                                 # ===================================
                                                 atualizarClientes(conbd,
@@ -385,23 +414,23 @@ while True:
                         tab = 'fornecedores'  # TABELA ESCOLHIDA
                         # =================================
 
-                        if verifica(conbd, tabela=tab, veri=0) != 0:  # Verifica se possui valores
+                        if verifica(conbd, tabela=tab) != 0:  # Verifica se possui valores
                             while True:
                                 print("=" * 50)
                                 oplinha = input("São os IDs {} na tabela [{}], digite o ID que deseja alterar \n"
                                                 "Ou digite [sair] para voltar \n"
                                                 "--> "
-                                                .format(verifica(conbd, tabela=tab, veri=0), tab))
+                                                .format(verifica(conbd, tabela=tab), tab))
                                 if oplinha != "sair":
                                     if oplinha.isnumeric():  # Verifica se o usuario digitou um número
                                         if int(oplinha) in verifica(conbd, tabela=tab,
-                                                                    veri=[]):  # Verifica número digitado do usúsario
+                                                                    ):  # Verifica número digitado do usúsario
                                             print("=" * 50)
                                             print("Aqui está a lista das colunas dessa tabela: \n",
-                                                verificaColums(conbd, table=tab, colum=[]))
+                                                verificaColums(conbd, table=tab))
                                             opcolum = input("Digite o nome da coluna que deseja alterar \n"
                                                             "--> ")
-                                            if opcolum in verificaColums(conbd, table=tab, colum=[]):
+                                            if opcolum in verificaColums(conbd, table=tab):
                                                 print("=" * 50)
                                                 # ===================================
                                                 atualizarFornecedores(conbd,
@@ -427,23 +456,23 @@ while True:
                         tab = 'funcionarios'  # TABELA ESCOLHIDA
                         # =================================
 
-                        if verifica(conbd, tabela=tab, veri=0) != 0:  # Verifica se possui valores
+                        if verifica(conbd, tabela=tab) != 0:  # Verifica se possui valores
                             while True:
                                 print("=" * 50)
                                 oplinha = input("São os IDs {} na tabela [{}], digite o ID que deseja alterar \n"
                                                 "Ou digite [sair] para voltar \n"
                                                 "--> "
-                                                .format(verifica(conbd, tabela=tab, veri=0), tab))
+                                                .format(verifica(conbd, tabela=tab), tab))
                                 if oplinha != "sair":
                                     if oplinha.isnumeric():  # Verifica se o usuario digitou um número
                                         if int(oplinha) in verifica(conbd, tabela=tab,
-                                                                    veri=[]):  # Verifica número digitado do usúsario
+                                                                    ):  # Verifica número digitado do usúsario
                                             print("=" * 50)
                                             print("Aqui está a lista das colunas dessa tabela: \n",
-                                                verificaColums(conbd, table=tab, colum=[]))
+                                                verificaColums(conbd, table=tab))
                                             opcolum = input("Digite o nome da coluna que deseja alterar \n"
                                                             "--> ")
-                                            if opcolum in verificaColums(conbd, table=tab, colum=[]):
+                                            if opcolum in verificaColums(conbd, table=tab):
                                                 print("=" * 50)
                                                 # ===================================
                                                 atualizarFuncionarios(conbd,
@@ -469,23 +498,23 @@ while True:
                         tab = 'promocoes'  # TABELA ESCOLHIDA
                         # =================================
 
-                        if verifica(conbd, tabela=tab, veri=0) != 0:  # Verifica se possui valores
+                        if verifica(conbd, tabela=tab) != 0:  # Verifica se possui valores
                             while True:
                                 print("=" * 50)
                                 oplinha = input("São os IDs {} na tabela [{}], digite o ID que deseja alterar \n"
                                                 "Ou digite [sair] para voltar \n"
                                                 "--> "
-                                                .format(verifica(conbd, tabela=tab, veri=0), tab))
+                                                .format(verifica(conbd, tabela=tab), tab))
                                 if oplinha != "sair":
                                     if oplinha.isnumeric():  # Verifica se o usuario digitou um número
                                         if int(oplinha) in verifica(conbd, tabela=tab,
-                                                                    veri=[]):  # Verifica número digitado do usúsario
+                                                                    ):  # Verifica número digitado do usúsario
                                             print("=" * 50)
                                             print("Aqui está a lista das colunas dessa tabela: \n",
-                                                verificaColums(conbd, table=tab, colum=[]))
+                                                verificaColums(conbd, table=tab))
                                             opcolum = input("Digite o nome da coluna que deseja alterar \n"
                                                             "--> ")
-                                            if opcolum in verificaColums(conbd, table=tab, colum=[]):
+                                            if opcolum in verificaColums(conbd, table=tab):
                                                 print("=" * 50)
                                                 # ===================================
                                                 atualizarPromocoes(conbd,
@@ -526,17 +555,17 @@ while True:
                         tab = 'produtos'
                         # ============================
 
-                        if verifica(conbd, tabela=tab, veri=0) != 0:  # Verifica se possui valores
+                        if verifica(conbd, tabela=tab) != 0:  # Verifica se possui valores
                             while True:
                                 print("=" * 50)
                                 oplinha = input("São os IDs {} na tabela [{}], digite o ID que deseja alterar \n"
                                                 "Ou digite [sair] para voltar \n"
                                                 "--> "
-                                                .format(verifica(conbd, tabela=tab, veri=[]), tab))
+                                                .format(verifica(conbd, tabela=tab), tab))
                                 if oplinha != "sair":
                                     if oplinha.isnumeric():  # Verifica se o usuario digitou um número
                                         if int(oplinha) in verifica(conbd, tabela=tab,
-                                                                    veri=[]):  # Verifica número digitado do usúsario
+                                                                    ):  # Verifica número digitado do usúsario
                                             # ==================================
                                             print("=" * 50)
                                             deletarProdutos(conbd, linha=oplinha)
@@ -557,17 +586,17 @@ while True:
                         tab = 'clientes'
                         # ============================
 
-                        if verifica(conbd, tabela=tab, veri=0) != 0:  # Verifica se possui valores
+                        if verifica(conbd, tabela=tab) != 0:  # Verifica se possui valores
                             while True:
                                 print("=" * 50)
                                 oplinha = input("São os IDs {} na tabela [{}], digite o ID que deseja alterar \n"
                                                 "Ou digite [sair] para voltar \n"
                                                 "--> "
-                                                .format(verifica(conbd, tabela=tab, veri=0), tab))
+                                                .format(verifica(conbd, tabela=tab), tab))
                                 if oplinha != "sair":
                                     if oplinha.isnumeric():  # Verifica se o usuario digitou um número
                                         if int(oplinha) in verifica(conbd, tabela=tab,
-                                                                    veri=[]):  # Verifica número digitado do usúsario
+                                                                    ):  # Verifica número digitado do usúsario
                                             # ==================================
                                             print("=" * 50)
                                             deletarClientes(conbd, linha=oplinha)
@@ -588,17 +617,17 @@ while True:
                         tab = 'fornecedores'
                         # ============================
 
-                        if verifica(conbd, tabela=tab, veri=0) != 0:  # Verifica se possui valores
+                        if verifica(conbd, tabela=tab) != 0:  # Verifica se possui valores
                             while True:
                                 print("=" * 50)
                                 oplinha = input("São os IDs {} na tabela [{}], digite o ID que deseja alterar \n"
                                                 "Ou digite [sair] para voltar \n"
                                                 "--> "
-                                                .format(verifica(conbd, tabela=tab, veri=0), tab))
+                                                .format(verifica(conbd, tabela=tab), tab))
                                 if oplinha != "sair":
                                     if oplinha.isnumeric():  # Verifica se o usuario digitou um número
                                         if int(oplinha) in verifica(conbd, tabela=tab,
-                                                                    veri=[]):  # Verifica número digitado do usúsario
+                                                                    ):  # Verifica número digitado do usúsario
                                             # ==================================
                                             print("=" * 50)
                                             deletarFornecedores(conbd, linha=oplinha)
@@ -619,17 +648,17 @@ while True:
                         tab = 'funcionarios'
                         # ============================
 
-                        if verifica(conbd, tabela=tab, veri=0) != 0:  # Verifica se possui valores
+                        if verifica(conbd, tabela=tab) != 0:  # Verifica se possui valores
                             while True:
                                 print("=" * 50)
                                 oplinha = input("São os IDs {} na tabela [{}], digite o ID que deseja alterar \n"
                                                 "Ou digite [sair] para voltar \n"
                                                 "--> "
-                                                .format(verifica(conbd, tabela=tab, veri=0), tab))
+                                                .format(verifica(conbd, tabela=tab), tab))
                                 if oplinha != "sair":
                                     if oplinha.isnumeric():  # Verifica se o usuario digitou um número
                                         if int(oplinha) in verifica(conbd, tabela=tab,
-                                                                    veri=[]):  # Verifica número digitado do usúsario
+                                                                   ):  # Verifica número digitado do usúsario
                                             # ==================================
                                             print("=" * 50)
                                             deletarFuncionarios(conbd, linha=oplinha)
@@ -650,17 +679,17 @@ while True:
                         tab = 'promocoes'
                         # ============================
 
-                        if verifica(conbd, tabela=tab, veri=0) != 0:  # Verifica se possui valores
+                        if verifica(conbd, tabela=tab) != 0:  # Verifica se possui valores
                             while True:
                                 print("=" * 50)
                                 oplinha = input("São os IDs {} na tabela [{}], digite o ID que deseja alterar \n"
                                                 "Ou digite [sair] para voltar \n"
                                                 "--> "
-                                                .format(verifica(conbd, tabela=tab, veri=0), tab))
+                                                .format(verifica(conbd, tabela=tab), tab))
                                 if oplinha != "sair":
                                     if oplinha.isnumeric():  # Verifica se o usuario digitou um número
                                         if int(oplinha) in verifica(conbd, tabela=tab,
-                                                                    veri=[]):  # Verifica número digitado do usúsario
+                                                                    ):  # Verifica número digitado do usúsario
                                             # ==================================
                                             print("=" * 50)
                                             deletarPromocoes(conbd, linha=oplinha)

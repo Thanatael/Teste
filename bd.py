@@ -1,6 +1,6 @@
 # ================================================ VERIFICAR ============================================================
 
-def verifica(condb, tabela, veri): # Função para verificar quantas linhas de ID a tabela possui
+def verifica(condb, tabela): # Função para verificar quantas linhas de ID a tabela possui
     mycursor = condb.cursor()
     mycursor.execute(f"SELECT * FROM {tabela}")
     myresult = mycursor.fetchall()
@@ -10,7 +10,17 @@ def verifica(condb, tabela, veri): # Função para verificar quantas linhas de I
     mycursor.close()
     return list(veri)
 
-def verificaColums(condb, table, colum): # Função para verificar quantas colunas a tabela possui
+def verificaNome(condb, tabela): # Função para verificar quantas linhas de ID a tabela possui
+    mycursor = condb.cursor()
+    mycursor.execute(f"SELECT * FROM {tabela}")
+    myresult = mycursor.fetchall()
+    veri = []
+    for x in myresult:
+        veri.append(x[1])
+    mycursor.close()
+    return list(veri)
+
+def verificaColums(condb, table): # Função para verificar quantas colunas a tabela possui
     mycursor = condb.cursor()
     mycursor.execute(f"DESCRIBE {table}")
     colum = mycursor.fetchall()
@@ -333,3 +343,23 @@ def Pedido(condb, data, toto):
     condb.commit()
     print("Pedido Finalizado!")
     mycursor.close()
+
+def detalhesPedi(condb, IDprodu, quanti):
+    mycursor = condb.cursor()
+    mycursor.execute("SELECT MAX(ID_Pedido) FROM pedidos")
+    IDpedi = mycursor.fetchone()[0]
+    sql = "INSERT INTO detalhespedido (ID_Pedido, ID_Produto, Quantidade) VALUES (%s, %s, %s)"
+    val = (IDpedi,IDprodu,quanti)
+    mycursor.execute(sql,val)
+    condb.commit()
+    mycursor.close()
+
+def Ovelhas(condb, nome): #  Vai pegar o ID do Produto com mesmo nome
+    mycursor = condb.cursor()
+    sql = f"SELECT ID_Produto FROM produtos WHERE Nome = %s"
+    val = (nome,)
+    mycursor.execute(sql,val)
+    ID = mycursor.fetchone()[0]
+    condb.commit()
+    mycursor.close()
+    return ID
