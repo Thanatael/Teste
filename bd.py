@@ -211,26 +211,40 @@ def atualizarPromocoes(condb, coluna, new, linha):
 
 def deletarProdutos(condb, linha):
     mycursor = condb.cursor()
-    sql = "DELETE FROM produtos WHERE ID_Produto = %s"
-    try:
-        sql1 = "DELETE FROM estoque WHERE ID_Produto = %s"
-        val1 = (linha,)
-        mycursor.execute(sql1, val1)
-    except:
-        sql2 = "DELETE FROM categoriaprodutos WHERE ID_Produto = %s"
-        val2 = (linha,)
-        mycursor.execute(sql2, val2)
 
-        sql3 = "DELETE FROM fornecedor WHERE ID_Produto = %s"
-        val3 = (linha,)
-        mycursor.execute(sql3, val3)
-    finally:
-        print("="*50)
+    sql1 = "DELETE FROM estoque WHERE ID_Produto = %s" # ESTOQUE
+    val1 = (linha,)
+    mycursor.execute(sql1, val1)
+
+    sql = "DELETE FROM produtos WHERE ID_Produto = %s" # PRODUTO
     val = (linha,)
     mycursor.execute(sql, val)
-    condb.commit()
-    print("Linha deletada de PRODUTOS com sucesso!")
-    mycursor.close()
+
+    try:
+        sql2 = "DELETE FROM categoriasprodutos WHERE ID_Categoria = %s"
+        val2 = (linha,)
+        mycursor.execute(sql2, val2)
+    except:
+        try:
+            sql3 = "DELETE FROM fornecedores WHERE ID_Fornecedor = %s"
+            val3 = (linha,)
+            mycursor.execute(sql3, val3)
+        except:
+            print("ERRO UM")
+            condb.rollback()
+    else:
+        try:
+            sql3 = "DELETE FROM fornecedores WHERE ID_Fornecedor = %s"
+            val3 = (linha,)
+            mycursor.execute(sql3, val3)
+        except:
+            print("ERRO DOIS")
+            condb.rollback()
+    finally:
+        condb.commit()
+        print("Linha deletada de PRODUTOS com sucesso!")
+        mycursor.close()
+
 
 def deletarClientes(condb, linha):
     mycursor = condb.cursor()

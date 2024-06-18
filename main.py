@@ -18,7 +18,8 @@ while True:
     if opc == "3":
         print("Encerrando..")
         break
-    elif opc == "1":  # ============================================================= PEDIDO
+    # ============================================================= PEDIDO
+    elif opc == "1":
             while True:
                 if clienteNovo:
                     print("=" * 50)
@@ -158,7 +159,8 @@ while True:
                 else:
                     print("Valor inválido, tente novamente.")
 
-    elif opc == "2":  # ============================================================= BANCO DE DADOS
+    # ============================================================= BANCO DE DADOS
+    elif opc == "2":
         while True:
             print("=" * 50)
             opcbc = input("Bem-vindo ao banco de dados! Selecione oque deseja fazer? \n"
@@ -187,23 +189,23 @@ while True:
 
 
                     elif opcadastro == "1":
+
                         print("=" * 20, "CADASTRANDO PRODUTOS", "=" * 20)
+
                         while True:
-                            opcate = input("Deseja cadastrar o novo produto a uma categoria? [1] para Sim e [2] para NÃO \n"
+                            opcate = input("Deseja cadastrar o novo produto a uma CATEGORIA? [1] para Sim e [2] para NÃO \n"
                                         "--> ")
 
-                            if opcate == "2":
+                            if opcate == "2": # ====== SEM CATEGORIA
 
-                                print("="*20,"SEM CATEGORIA","="*20)
+                                print("="*50)
 
                                 while True:
                                     opcate = input(
-                                        "Deseja cadastrar o novo produto a um fornecedor? [1] para Sim e [2] para NÃO \n"
+                                        "Deseja cadastrar o novo produto a um FORNECEDOR? [1] para Sim e [2] para NÃO \n"
                                         "--> ")
 
-                                    if opcate == "2":
-
-                                        print("="*20,"SOMENTE PRODUTO","="*20)
+                                    if opcate == "2": # ====== SOMENTE PRODUTO
 
                                         cadastrarProdutos(conbd,
                                                         nome=input("Digite o nome: "),
@@ -213,18 +215,25 @@ while True:
 
                                         break
 
-                                    elif opcate == "1":
+                                    elif opcate == "1": # ====== COM FONECEDOR
 
-                                        print("="*20,"COM FORNECEDOR","="*20)
+                                        pnome = input("Digite o nome do produto: ")
+                                        pdes = input("Digite a descrição do produto: ")
+                                        ppreco = input("Digite o preço do produto: ")
+                                        pquanti = input("Digite a quantidade em estoque: ")
+                                        print("="*15,"FORNECEDOR","="*15)
+                                        ffnome = input("Digite o nome do fornecedor: ")
+                                        ffcontato = input("Digite o contato do fornecdor: ")
+                                        ffende = input("Digite o endereçodo fornecedor: ")
 
                                         cadastrarProdutosF(conbd,
-                                                        nome=input("Digite o nome: "),
-                                                        descricao=input("Digite a descrição: "),
-                                                        preco=input("Digite o preço: "),
-                                                        quantidade=input("Digite a quantidade: "),
-                                                        fnome=input("Digite o nome do fornecedor: "),
-                                                        fcontato=input("Digite o contato: "),
-                                                        fende=input("Digite o endereço: "))
+                                                        nome=pnome,
+                                                        descricao=pdes,
+                                                        preco=ppreco,
+                                                        quantidade=pquanti,
+                                                        fnome=ffnome,
+                                                        fcontato=ffcontato,
+                                                        fende=ffende)
 
                                         break
                                     else:
@@ -233,43 +242,59 @@ while True:
 
                                 break
 
-                            elif opcate == "1":
-
-                                print("="*20,"COM CATEGORIA","="*20)
+                            elif opcate == "1": # ====== COM CATEGORIA
 
                                 while True:
                                     opcate = input(
-                                        "Deseja cadastrar o novo produto a um fornecedor? [1] para Sim e [2] para NÃO \n"
+                                        "Deseja cadastrar o novo produto a um FORNECEDOR? [1] para Sim e [2] para NÃO \n"
                                         "--> ")
 
-                                    if opcate == "2":
+                                    if opcate == "2": # ====== PRODUTO COM CATEGORIA
 
-                                        print("="*20,"PRODUTO COM CATEGORIA","="*20)
+                                        pnome = input("Digite o nome do produto: ")
+                                        pdes = input("Digite a descrição do produto: ")
+                                        ppreco = input("Digite o preço do produto: ")
+                                        pquanti = input("Digite a quantidade em estoque: ")
+                                        print("="*15,"CATEGORIA","="*15)
+                                        ccnome = input("Digite a categoria do produto: ")
+                                        ccdes = input("Digite a descrição da categoria: ")
 
                                         cadastrarProdutosC(conbd,
-                                                        nome=input("Digite o nome: "),
-                                                        descricao=input("Digite a descrição: "),
-                                                        preco=input("Digite o preço: "),
-                                                        quantidade=input("Digite a quantidade: "),
-                                                        cnome=input("Digite a categoria: "),
-                                                        cdes=input("Digite a descrição da categoria: "))
+                                                        nome=pnome,
+                                                        descricao=pdes,
+                                                        preco=ppreco,
+                                                        quantidade=pquanti,
+                                                        cnome=ccnome,
+                                                        cdes=ccdes)
 
                                         break
 
-                                    elif opcate == "1":
+                                    elif opcate == "1": # ====== PRODUTO COM CATEGORIA E FORNECEDOR
 
-                                        print("="*10,"PRODUTO COM CATEGORIA E FORNECEDOR","="*10)
+                                        pnome = input("Digite o nome do produto: ")
+                                        pdes = input("Digite a descrição do produto: ")
+                                        ppreco = input("Digite o preço do produto: ")
+                                        pquanti = input("Digite a quantidade em estoque: ")
+
+                                        print("=" * 15, "FORNECEDOR", "=" * 15)
+                                        ffnome = input("Digite o nome do fornecedor: ")
+                                        ffcontato = input("Digite o contato do fornecdor: ")
+                                        ffende = input("Digite o endereçodo fornecedor: ")
+
+                                        print("=" * 15, "CATEGORIA", "=" * 15)
+                                        ccnome = input("Digite a categoria do produto: ")
+                                        ccdes = input("Digite a descrição da categoria: ")
 
                                         cadastrarProdutosCF(conbd,
-                                                        nome=input("Digite o nome: "),
-                                                        descricao=input("Digite a descrição: "),
-                                                        preco=input("Digite o preço: "),
-                                                        quantidade=input("Digite a quantidade: "),
-                                                        cnome=input("Digite a categoria: "),
-                                                        cdes=input("Digite a descrição da categoria: "),
-                                                        fnome=input("Digite o nome do fornecedor: "),
-                                                        fcontato=input("Digite o contato: "),
-                                                        fende=input("Digite o endereço: "))
+                                                        nome=pnome,
+                                                        descricao=pdes,
+                                                        preco=ppreco,
+                                                        quantidade=pquanti,
+                                                        cnome=ccnome,
+                                                        cdes=ccdes,
+                                                        fnome=ffnome,
+                                                        fcontato=ffcontato,
+                                                        fende=ffende)
 
                                         break
                                     else:
